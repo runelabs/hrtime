@@ -37,6 +37,7 @@ using namespace node;
 extern "C"
 
 void init(Handle<Object> target) {
+  HandleScope scope;
 
   hrtime_v8::Initialize(target);
 
@@ -50,6 +51,7 @@ static clockid_t init_clock = CLOCK_MONOTONIC;
 static char rns[32] = "";
 
 void Initialize(Handle<Object> target) {
+  HandleScope scope;
 
   if (clock_gettime(init_clock, &init_time) != 0 ) {
     init_clock = CLOCK_REALTIME;
@@ -85,23 +87,24 @@ void Initialize(Handle<Object> target) {
  * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
  */
 Handle<Value> Time(const Arguments &args) {
+  HandleScope scope;
 
   clockid_t clockid = CLOCK_REALTIME;
   timespec new_time;
   char ns[32] = "";
   encoding encode = ASCII;
 
-  if (clock_gettime(clockid, &new_time) != 0) return Encode(ns, 0, encode);
+  if (clock_gettime(clockid, &new_time) != 0) return scope.Close(String::New(""));
 
   if (args.Length() > 0) {
     if (args[0]->BooleanValue() == true) {
       sprintf(ns, "%lu", new_time.tv_nsec);
-      return Encode(ns, strlen(ns), encode);
+      return scope.Close(Encode(ns, strlen(ns), encode));
     }
   }
 
   sprintf(ns, "%lu%.9lu", new_time.tv_sec, new_time.tv_nsec);
-  return Encode(ns, strlen(ns), encode);
+  return scope.Close(Encode(ns, strlen(ns), encode));
 
 }
 
@@ -114,16 +117,17 @@ Handle<Value> Time(const Arguments &args) {
  * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
  */
 Handle<Value> Uptime(const Arguments &args) {
+  HandleScope scope;
 
   clockid_t clockid = CLOCK_MONOTONIC;
   timespec new_time;
   char ns[32] = "";
   encoding encode = ASCII;
 
-  if (clock_gettime(clockid, &new_time) != 0) return Encode(ns, 0, encode);
+  if (clock_gettime(clockid, &new_time) != 0) return scope.Close(String::New(""));
 
   sprintf(ns, "%lu%.9lu", new_time.tv_sec, new_time.tv_nsec);
-  return Encode(ns, strlen(ns), encode);
+  return scope.Close(Encode(ns, strlen(ns), encode));
 
 }
 
@@ -136,13 +140,14 @@ Handle<Value> Uptime(const Arguments &args) {
  * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
  */
 Handle<Value> Cputime(const Arguments &args) {
+  HandleScope scope;
 
   clockid_t clockid = CLOCK_PROCESS_CPUTIME_ID;
   timespec new_time;
   char ns[32] = "";
   encoding encode = ASCII;
 
-  if (clock_gettime(clockid, &new_time) != 0) return Encode(ns, 0, encode);
+  if (clock_gettime(clockid, &new_time) != 0) return scope.Close(String::New(""));
 
   if (new_time.tv_sec > 0) {
     sprintf(ns, "%lu%.9lu", new_time.tv_sec, new_time.tv_nsec);
@@ -150,7 +155,7 @@ Handle<Value> Cputime(const Arguments &args) {
   else {
     sprintf(ns, "%lu", new_time.tv_nsec);
   }
-  return Encode(ns, strlen(ns), encode);
+  return scope.Close(Encode(ns, strlen(ns), encode));
 
 }
 
@@ -164,14 +169,15 @@ Handle<Value> Cputime(const Arguments &args) {
  * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
  */
 Handle<Value> Initime(const Arguments &args) {
+  HandleScope scope;
 
   char ns[32] = "";
   encoding encode = ASCII;
 
-  if (init_time.tv_sec <= 0 || init_time.tv_nsec <= 0) return Encode(ns, 0, encode);
+  if (init_time.tv_sec <= 0 || init_time.tv_nsec <= 0) return scope.Close(String::New(""));
 
   sprintf(ns, "%lu%.9lu", init_time.tv_sec, init_time.tv_nsec);
-  return Encode(ns, strlen(ns), encode);
+  return scope.Close(Encode(ns, strlen(ns), encode));
 
 }
 
@@ -184,6 +190,7 @@ Handle<Value> Initime(const Arguments &args) {
  * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
  */
 Handle<Value> Runtime(const Arguments &args) {
+  HandleScope scope;
 
   clockid_t clockid = init_clock;
   timespec new_time;
@@ -191,7 +198,7 @@ Handle<Value> Runtime(const Arguments &args) {
   char ns[32] = "";
   encoding encode = ASCII;
 
-  if (clock_gettime(clockid, &new_time) != 0) return Encode(ns, 0, encode);
+  if (clock_gettime(clockid, &new_time) != 0) return scope.Close(String::New(""));
 
   run_time.tv_sec = new_time.tv_sec - init_time.tv_sec;
   if (new_time.tv_nsec < init_time.tv_nsec) {
@@ -208,7 +215,7 @@ Handle<Value> Runtime(const Arguments &args) {
   else {
     sprintf(ns, "%lu", run_time.tv_nsec);
   }
-  return Encode(ns, strlen(ns), encode);
+  return scope.Close(Encode(ns, strlen(ns), encode));
 
 }
 
@@ -221,16 +228,17 @@ Handle<Value> Runtime(const Arguments &args) {
  * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_getres.html
  */
 Handle<Value> Resolution(const Arguments &args) {
+  HandleScope scope;
 
   clockid_t clockid = CLOCK_REALTIME;
   timespec new_res;
   char ns[16] = "";
   encoding encode = ASCII;
 
-  if (clock_getres(clockid, &new_res) != 0) return Encode(ns, 0, encode);
+  if (clock_getres(clockid, &new_res) != 0) return scope.Close(String::New(""));
 
   sprintf(ns, "%lu", new_res.tv_nsec);
-  return Encode(ns, strlen(ns), encode);
+  return scope.Close(Encode(ns, strlen(ns), encode));
 
 }
 
