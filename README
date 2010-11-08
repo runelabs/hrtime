@@ -1,0 +1,111 @@
+hrtime:	a module with a simple interface to POSIX system high resolution time functions
+	for the node.js runtime framework.
+
+Author	Rune Karlsen <runelabs@gmail.com>
+Website	http://github.com/runelabs/hrtime
+
+Provides the following functions - all returning nanosecond numbers as string:
+	time() - realtime clock in nanoseconds
+	uptime() - system uptime in nanoseconds
+	cputime() - accumulated time spent by cpu on the process in nanoseconds
+	initime() - time of module initialization in nanoseconds
+	runtime() - time since module was initialized in nanoseconds
+	resolution() - time resolution of the realtime clock in nanoseconds
+
+
+Requires the "node.js" package which is a "CommonJS" implementatotion.
+See www.nodejs.org and www.commonjs.org .
+
+
+
+
+To build this module for node.js, after having installed node.js, run
+	node-waf configure
+	node-waf build
+
+Then to use this module
+	cp hrtime.node <your project destination>
+
+and include in your node.js Javascript the following
+	var hrtime = require "./hrtime";
+
+which will load the hrtime module from the same directory as your script.
+
+
+
+
+
+Example usage:
+
+	(1)
+	var rtime = hrtime.runtime(); // time since the node.js process was started, running time of program
+
+	(2)
+	var stime = hrtime.cputime(); // starttime of measurement
+	var mytime = hrtime.time(); // example operation/block being measured or profiled
+	var etime = hrtime.cputime(); // endtime of measurement
+	var dtime = etime - stime; // cpu time/effort used on the operation measured/profiled
+
+	(3)
+	var atime = hrtime.uptime(); // some point in time since the system was booted
+	var mytime = hrtime.time(); // example operation/block being measured or profiled
+	var btime = hrtime.uptime() // next point in time since the system was booted
+	var dtime = btime - atime; // nanoseconds between the two points in time, real time elapsed before completion
+
+	(4)
+	var time1 = hrtime.time(); // real time clock at first point
+	var restime = hrtime.resolution(); // example operation/block being measured or profiled
+	var time1 = hrtime.time(); // real time clock at second point
+	var dtime = time2 - time1; // nanoseconds between the two points in time, real time elapsed before completion
+
+
+Note that in example (4) the clock can be adjusted by daylight savings time, system adjustments like NTP or otherwise,
+and thus might give unexpected timing/profiling results.
+
+
+Further function details:
+
+
+ * NAME: time()
+ * RETURNS: An ASCII string representing system realtime clock high resolution time in number of nanoseconds.
+ *   Note that daylight savings time (DST) and other system clock adjustments will influence this time result.
+ * ERRORS: Returns an empty string ("") on any error that occured during the request.
+ * PARAMETERS: If a boolean value of 'true' is passed, then only the nanosecond part of the time will be returned.
+ * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
+
+
+ * NAME: uptime()
+ * RETURNS: An ASCII string representing the high resolution time in number of nanoseconds that has passed since the last boot time or time epoch.
+ * ERRORS: Returns an empty string ("") on any error that occured during the request.
+ * PARAMETERS: NONE.
+ * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
+
+
+ * NAME: cputime()
+ * RETURNS: An ASCII string representing the high resolution time in number of nanoseconds of the accumulated time the cpu has spent working on the process.
+ * ERRORS: Returns an empty string ("") on any error that occured during the request.
+ * PARAMETERS: NONE.
+ * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
+
+
+ * NAME: initime()
+ * RETURNS: An ASCII string representing the high resolution time in number of nanoseconds of the time when the module was initialized.
+ *   Note that the time defaults to the same clock as uptime(), but will use the realtime clock if the former is unavailable.
+ * ERRORS: Returns an empty string ("") on any error that occured during the request.
+ * PARAMETERS: NONE.
+ * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
+
+
+ * NAME: runtime()
+ * RETURNS: An ASCII string representing the high resolution time in number of nanoseconds of the time passed since the module was initialized.
+ * ERRORS: Returns an empty string ("") on any error that occured during the request.
+ * PARAMETERS: NONE.
+ * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_gettime.html
+
+
+ * NAME: resolution()
+ * RETURNS: An ASCII string representing the resolution of the realtime clock in number of nanoseconds.
+ * ERRORS: Returns an empty string ("") on any error that occured during the request.
+ * PARAMETERS: NONE.
+ * SEE: http://www.opengroup.org/onlinepubs/009695399/functions/clock_getres.html
+
